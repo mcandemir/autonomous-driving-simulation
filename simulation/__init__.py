@@ -36,7 +36,6 @@ class Simulation:
                 cam_img1 = self.LeftCam.process(cam_img1)
                 cam_img2 = self.RightCam.process(cam_img2)
 
-                # todo: completed controller 10/8
                 m1 = self.LeftCam.m
                 m2 = self.RightCam.m
                 avg_y1 = self.LeftCam.avg_y
@@ -56,35 +55,18 @@ class Simulation:
 
     # todo: optimize controller
     def controller(self, m1, m2, avg_y1, true_y1, avg_y2, true_y2):
-        # : None None
-        self.carcontroller.go()
-        if m1 is None and m2 is None:
-            self.carcontroller.go_straight()
-        # : v None
-        elif m2 is None and m1 is not None:
-            if m1 < -0.005:
-                self.carcontroller.go_left()
-            elif m1 > 0.005:
-                self.carcontroller.go_right()
-            elif -0.005 < m1 < 0.005:
+        self.carcontroller.start()
+        if m1 is not None:
+            if m1 < -0.05:
+                self.carcontroller.go_left(avg_y1, true_y1, m1)
+            else:
                 self.carcontroller.go_straight()
-        # : None v
-        elif m1 is None and m2 is not None:
-            if m2 < -0.005:
-                self.carcontroller.go_left()
-            elif m2 > 0.005:
-                self.carcontroller.go_right()
-            elif -0.005 < m2 < 0.005:
+
+        elif m2 is not None:
+            if m2 > 0.05:
+                self.carcontroller.go_right(avg_y2, true_y2, m2)
+            else:
                 self.carcontroller.go_straight()
-        # : v v
-        elif m1 is not None and m2 is not None:
-            if m1 < -0.005 and m2 < -0.005:
-                self.carcontroller.go_left()
-            elif m1 > 0.005 and m2 > 0.005:
-                self.carcontroller.go_right()
-            elif -0.005 < m1 < 0.005 and -0.005 < m2 < 0.005:
-                self.carcontroller.go_straight()
-                # todo: implement self.carcontroller.center()
 
 
 
@@ -113,36 +95,9 @@ class Simulation:
 
 
 
-    # def controller(self, m1, m2, avg_y1, true_y1, avg_y2, true_y2):
-    #     # : None None
-    #     self.keyboard.press('w')
-    #     if m1 is None and m2 is None:
-    #         self.keyboard.release('d')
-    #         self.keyboard.release('a')
-    #     # : v None
-    #     elif m2 is None and m1 is not None:
-    #         if m1 < -0.005:
-    #             self.keyboard.release('d')
-    #             self.keyboard.press('a')
-    #         elif m1 > 0.005:
-    #             self.keyboard.release('a')
-    #             self.keyboard.press('d')
-    #     # : None v
-    #     elif m1 is None and m2 is not None:
-    #         if m2 < -0.005:
-    #             self.keyboard.release('d')
-    #             self.keyboard.press('a')
-    #         elif m2 > 0.005:
-    #             self.keyboard.release('a')
-    #             self.keyboard.press('d')
-    #     # : v v
-    #     elif m1 is not None and m2 is not None:
-    #         if m1 < -0.005 or m2 < -0.005:
-    #             self.keyboard.release('d')
-    #             self.keyboard.press('a')
-    #         elif m1 > 0.005 or m2 > 0.005:
-    #             self.keyboard.release('a')
-    #             self.keyboard.press('d')
+
+
+
 
 
 sim = Simulation(mode='side')
