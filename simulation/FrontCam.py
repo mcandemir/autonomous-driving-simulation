@@ -1,4 +1,0 @@
-
-
-class FrontCam:
-    pass
