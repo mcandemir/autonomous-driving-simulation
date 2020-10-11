@@ -1,4 +1,3 @@
-from FrontCam import FrontCam
 from LeftCam import LeftCam
 from RightCam import RightCam
 import cv2
@@ -15,7 +14,6 @@ class Simulation:
         self.cam_pos2 = None
         self.LeftCam = LeftCam()
         self.RightCam = RightCam()
-        self.FrontCam = FrontCam()
         self.carcontroller = CarController()
         self.set_view()
 
