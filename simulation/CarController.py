@@ -8,10 +8,12 @@ class CarController:
         self.turning_right = None
         self.centering = None
 
+    # unused
     def steer_left(self):
         self.keyboard.release('d')
         self.keyboard.press('a')
 
+    # unused
     def steer_right(self):
         self.keyboard.release('a')
         self.keyboard.press('d')
@@ -42,9 +44,11 @@ class CarController:
         self.keyboard.release('s')
         self.keyboard.press('w')
 
+    # unused
     def stop(self):
         self.keyboard.release('w')
 
+    # unused : not working, bad effects
     def center(self, avg_y1, avg_y2):
         if avg_y1 > avg_y2:
             self.keyboard.press('a')
