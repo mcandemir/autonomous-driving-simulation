@@ -1,10 +1,9 @@
-from LeftCam import LeftCam
-from RightCam import RightCam
+from SideCam import SideCam
 import cv2
 import numpy as np
 from PIL import ImageGrab
 from SetScreen import set_pos
-from CarController import CarController
+from pynput.keyboard import Controller
 
 
 class Simulation:
@@ -12,9 +11,9 @@ class Simulation:
         self.mode = mode
         self.cam_pos1 = None
         self.cam_pos2 = None
-        self.LeftCam = LeftCam()
-        self.RightCam = RightCam()
-        self.carcontroller = CarController()
+        self.LeftCam = SideCam('left')
+        self.RightCam = SideCam('right')
+        self.keyboard = Controller()
         self.set_view()
 
     def set_view(self):
@@ -40,16 +39,8 @@ class Simulation:
                 cam_img1 = self.LeftCam.process(cam_img1)
                 cam_img2 = self.RightCam.process(cam_img2)
 
-                """m: slope, avg_y: average height of line, true_y: height of true line"""
-                m1 = self.LeftCam.m
-                m2 = self.RightCam.m
-                avg_y1 = self.LeftCam.avg_y
-                true_y1 = self.LeftCam.true_y
-                avg_y2 = self.RightCam.avg_y
-                true_y2 = self.RightCam.true_y
-
-                """controller decision tree"""
-                self.controller(m1, m2, avg_y1, true_y1, avg_y2, true_y2)
+                """avg_y: average height of line, true_y: height of true line"""
+                self.controller()
 
                 """monitoring processing"""
                 cv2.imshow('left', cam_img1)
@@ -61,19 +52,42 @@ class Simulation:
                     return
 
     # todo: optimize controller
-    def controller(self, m1, m2, avg_y1, true_y1, avg_y2, true_y2):
-        self.carcontroller.start()
-        if m1 is not None:
-            if m1 < -0.05:
-                self.carcontroller.go_left(avg_y1, true_y1, m1)
-            else:
-                self.carcontroller.go_straight()
+    def controller(self):
+        self.keyboard.press('w')
 
-        elif m2 is not None:
-            if m2 > 0.05:
-                self.carcontroller.go_right(avg_y2, true_y2, m2)
-            else:
-                self.carcontroller.go_straight()
+        """avg_y: average height of line, true_y: height of true line"""
+        avg_y1 = self.LeftCam.avg_y
+        true_y1 = self.LeftCam.true_y
+        avg_y2 = self.RightCam.avg_y
+        true_y2 = self.RightCam.true_y
+
+        # if left is open
+        if avg_y1:
+            if true_y1 + 5 <= avg_y1 <= true_y1 + 5:
+                self.keyboard.release('a')
+                self.keyboard.release('d')
+            elif avg_y1 < true_y1:
+                self.keyboard.release('d')
+                self.keyboard.press('a')
+                print('steering left')
+            elif avg_y1 > true_y1:
+                self.keyboard.release('a')
+                self.keyboard.press('d')
+                print('steering right')
+
+        # if right is open
+        elif avg_y2:
+            if true_y2 + 5 <= avg_y2 <= true_y2 + 5:
+                self.keyboard.release('a')
+                self.keyboard.release('d')
+            elif avg_y2 < true_y2:
+                self.keyboard.release('a')
+                self.keyboard.press('d')
+                print('steering right')
+            elif avg_y2 > true_y2:
+                self.keyboard.release('d')
+                self.keyboard.press('a')
+                print('steering left')
 
 
 sim = Simulation(mode='side')
