@@ -63,9 +63,10 @@ class Simulation:
 
         # if left is open
         if avg_y1:
-            if true_y1 + 5 <= avg_y1 <= true_y1 + 5:
+            if true_y1 - 5 <= avg_y1 <= true_y1 + 5:
                 self.keyboard.release('a')
                 self.keyboard.release('d')
+                print('going forward')
             elif avg_y1 < true_y1:
                 self.keyboard.release('d')
                 self.keyboard.press('a')
@@ -77,9 +78,10 @@ class Simulation:
 
         # if right is open
         elif avg_y2:
-            if true_y2 + 5 <= avg_y2 <= true_y2 + 5:
+            if true_y2 - 5 <= avg_y2 <= true_y2 + 5:
                 self.keyboard.release('a')
                 self.keyboard.release('d')
+                print('going forward')
             elif avg_y2 < true_y2:
                 self.keyboard.release('a')
                 self.keyboard.press('d')
@@ -88,6 +90,12 @@ class Simulation:
                 self.keyboard.release('d')
                 self.keyboard.press('a')
                 print('steering left')
+
+        # if lost
+        else:
+            self.keyboard.release('w')
+            self.keyboard.release('a')
+            self.keyboard.release('d')
 
 
 sim = Simulation(mode='side')

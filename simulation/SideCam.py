@@ -63,4 +63,3 @@ class SideCam:
         print(f'============{self.cam} CAM===============')
         for i in args:
             print(i)
-
