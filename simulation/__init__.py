@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from PIL import ImageGrab
 from SetScreen import set_pos
-from pynput.keyboard import Controller
+from CarController import CarController
 
 
 class Simulation:
@@ -13,7 +13,7 @@ class Simulation:
         self.cam_pos2 = None
         self.LeftCam = SideCam('left')
         self.RightCam = SideCam('right')
-        self.keyboard = Controller()
+        self.carcontroller = CarController()
         self.set_view()
 
     def set_view(self):
@@ -53,8 +53,6 @@ class Simulation:
 
     # todo: optimize controller
     def controller(self):
-        self.keyboard.press('w')
-
         """avg_y: average height of line, true_y: height of true line"""
         avg_y1 = self.LeftCam.avg_y
         true_y1 = self.LeftCam.true_y
@@ -63,39 +61,16 @@ class Simulation:
 
         # if left is open
         if avg_y1:
-            if true_y1 - 5 <= avg_y1 <= true_y1 + 5:
-                self.keyboard.release('a')
-                self.keyboard.release('d')
-                print('going forward')
-            elif avg_y1 < true_y1:
-                self.keyboard.release('d')
-                self.keyboard.press('a')
-                print('steering left')
-            elif avg_y1 > true_y1:
-                self.keyboard.release('a')
-                self.keyboard.press('d')
-                print('steering right')
+            self.carcontroller.go_left(avg_y1, true_y1)
 
         # if right is open
         elif avg_y2:
-            if true_y2 - 5 <= avg_y2 <= true_y2 + 5:
-                self.keyboard.release('a')
-                self.keyboard.release('d')
-                print('going forward')
-            elif avg_y2 < true_y2:
-                self.keyboard.release('a')
-                self.keyboard.press('d')
-                print('steering right')
-            elif avg_y2 > true_y2:
-                self.keyboard.release('d')
-                self.keyboard.press('a')
-                print('steering left')
+            self.carcontroller.go_right(avg_y2, true_y2)
 
         # if lost
         else:
-            self.keyboard.release('w')
-            self.keyboard.release('a')
-            self.keyboard.release('d')
+            if self.carcontroller.moving:
+                self.carcontroller.stop()
 
 
 sim = Simulation(mode='side')
