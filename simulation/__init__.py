@@ -1,4 +1,5 @@
 from SideCam import SideCam
+from FrontCam import FrontCam
 import cv2
 import numpy as np
 from PIL import ImageGrab
@@ -11,6 +12,8 @@ class Simulation:
         self.mode = mode
         self.cam_pos1 = None
         self.cam_pos2 = None
+        self.cam_pos3 = None
+        self.FrontCam = FrontCam()
         self.LeftCam = SideCam('left')
         self.RightCam = SideCam('right')
         self.carcontroller = CarController()
@@ -23,6 +26,7 @@ class Simulation:
         if self.mode == 'side':
             self.cam_pos1 = set_pos()
             self.cam_pos2 = set_pos()
+            self.cam_pos3 = set_pos()
 
     def run(self):
         while True:
@@ -30,14 +34,17 @@ class Simulation:
                 """take screenshots"""
                 cam_img1 = ImageGrab.grab(self.cam_pos1)
                 cam_img2 = ImageGrab.grab(self.cam_pos2)
+                cam_img3 = ImageGrab.grab(self.cam_pos3)
 
                 """convert into numpy form"""
                 cam_img1 = cv2.cvtColor(np.array(cam_img1), cv2.COLOR_RGB2BGR)
                 cam_img2 = cv2.cvtColor(np.array(cam_img2), cv2.COLOR_RGB2BGR)
+                cam_img3 = cv2.cvtColor(np.array(cam_img3), cv2.COLOR_RGB2BGR)
 
                 """do required processings"""
                 cam_img1 = self.LeftCam.process(cam_img1)
                 cam_img2 = self.RightCam.process(cam_img2)
+                cam_img3 = self.FrontCam.process(cam_img3)
 
                 """avg_y: average height of line, true_y: height of true line"""
                 self.controller()
@@ -45,6 +52,7 @@ class Simulation:
                 """monitoring processing"""
                 cv2.imshow('left', cam_img1)
                 cv2.imshow('right', cam_img2)
+                cv2.imshow('front', cam_img3)
                 q = cv2.waitKey(1)
 
                 if q == 27:
@@ -58,18 +66,24 @@ class Simulation:
         true_y1 = self.LeftCam.true_y
         avg_y2 = self.RightCam.avg_y
         true_y2 = self.RightCam.true_y
+        command = self.FrontCam.command
 
-        # if left is open
-        if avg_y1:
-            self.carcontroller.go_left(avg_y1, true_y1)
-
-        # if right is open
-        elif avg_y2:
-            self.carcontroller.go_right(avg_y2, true_y2)
-
-        # if lost
+        if command:
+            if command == "stop":
+                self.carcontroller.stop()
+            elif command == "go":
+                self.carcontroller.go_straight()
         else:
-            if self.carcontroller.moving:
+            # if left is open
+            if avg_y1:
+                self.carcontroller.go_left(avg_y1, true_y1)
+
+            # if right is open
+            elif avg_y2:
+                self.carcontroller.go_right(avg_y2, true_y2)
+
+            # if lost
+            else:
                 self.carcontroller.stop()
 
 

@@ -47,12 +47,13 @@ class CarController:
         print('going forward')
 
     def stop(self):
-        self.moving = False
-        self.keyboard.release('a')
-        self.keyboard.release('d')
-        self.keyboard.release('w')
-        self.keyboard.press('s')
-        print('stopping')
-        time.sleep(0.60)
-        print('stopped')
-        self.keyboard.release('s')
+        if self.moving:
+            self.moving = False
+            self.keyboard.release('a')
+            self.keyboard.release('d')
+            self.keyboard.release('w')
+            self.keyboard.press('s')
+            print('stopping')
+            time.sleep(0.57)
+            print('stopped')
+            self.keyboard.release('s')

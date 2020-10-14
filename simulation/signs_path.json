@@ -1,0 +1,7 @@
+{
+  "traffic_light": "signs/traffic_light.png",
+  "red": "signs/red.png",
+  "yellow": "signs/yellow.png",
+  "green": "signs/green.png",
+  "stop": "signs/stop_object.png"
+}
